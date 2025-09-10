@@ -39,7 +39,7 @@ a:hover:not(nav a) { color: var(--bg); background: var(--text); }
 
 nav { display: flex; margin-top: var(--space-md); gap: var(--space-md); }
 
-nav svg { width: 3rem; height: 3rem; }
+nav svg { width: 3rem; height: 3rem; fill: var(--text); }
 
 nav svg:hover { opacity: 0.6; }
 
