@@ -23,7 +23,7 @@ body { font: 1.25rem/1.5 system-ui, sans-serif; background: var(--bg); color: va
 
 h1, h2, h3 { margin: var(--space-lg) 0 0; }
 
-h1 { font-size: 2.5rem; }
+h1 { font-size: 2.25rem; }
 h2 { font-size: 2rem; }
 h3 { font-size: 1.5rem; }
 
