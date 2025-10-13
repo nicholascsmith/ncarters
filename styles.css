@@ -41,7 +41,7 @@ nav { display: flex; margin-top: var(--space-md); gap: var(--space-md); }
 
 nav svg { width: 2.5rem; height: 2.5rem; fill: var(--text); }
 
-nav svg:hover { opacity: 0.6; }
+nav svg:hover { opacity: 0.8; }
 
 ul { list-style: none; padding: 0; }
 

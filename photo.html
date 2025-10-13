@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="styles.css">
   <style>
     .photo-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+    .photo-header:hover .photo-pfp,
+    .photo-header:hover .photo-username { opacity: 0.8; }
+    .photo-header a { background: none !important; }
     .photo-pfp { width: 60px; height: 60px; border-radius: 50%; }
     .photo-info { display: flex; flex-direction: column; gap: var(--space-xs); }
     .photo-username { font-weight: 600; font-size: 1rem; color: var(--text); text-decoration: none; }
@@ -29,7 +32,7 @@
     .mute-indicator svg { width: 16px; height: 16px; fill: #fff; }
     .caption { margin-top: var(--space-lg); }
     .caption strong { font-weight: 600; }
-    .back-link { display: inline-block; margin-top: var(--space-lg); color: var(--text); text-decoration: none; font-weight: 600; }
+    .back-link { display: inline-block; margin-top: var(--space-lg); color: var(--text); font-weight: 600; }
   </style>
 </head>
 <body>
