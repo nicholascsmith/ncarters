@@ -1,0 +1,20 @@
+[
+  {
+    "file": "photo1.jpg",
+    "song": "Blinding Lights",
+    "artist": "The Weeknd",
+    "caption": "Late night coding session"
+  },
+  {
+    "file": "photo2.jpg",
+    "song": "Lose Yourself",
+    "artist": "Eminem",
+    "caption": "Morning coffee vibes"
+  },
+  {
+    "file": "photo3.jpg",
+    "song": "Bohemian Rhapsody",
+    "artist": "Queen",
+    "caption": "Just another day"
+  }
+]

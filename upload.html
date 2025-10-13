@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Upload - ncarters</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .form-group { margin: var(--space-lg) 0; }
+    label { display: block; margin-bottom: var(--space-sm); font-weight: 600; }
+    input[type="text"], input[type="password"], textarea, input[type="file"] {
+      width: 100%;
+      padding: var(--space-md);
+      border: 1px solid var(--text-dim);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+      font-family: system-ui, sans-serif;
+      border-radius: 4px;
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    button {
+      width: 100%;
+      padding: var(--space-md);
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: var(--space-lg);
+      border-radius: 4px;
+    }
+    button:hover { opacity: 0.8; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status {
+      margin-top: var(--space-lg);
+      padding: var(--space-md);
+      display: none;
+      border: 1px solid var(--text-dim);
+    }
+    .status.success { display: block; }
+    .status.error { display: block; color: #ff6b6b; }
+    .preview { max-width: 100%; margin-top: var(--space-md); }
+    .info { font-size: 0.9rem; color: var(--text-dim); margin-top: var(--space-xs); }
+  </style>
+</head>
+<body>
+  <main>
+    <section>
+      <h1>Upload Photo</h1>
+
+  <form id="uploadForm">
+    <div class="form-group">
+      <label>GitHub Personal Access Token</label>
+      <input type="password" id="token" required placeholder="ghp_...">
+      <div class="info">Create at: github.com/settings/tokens (needs 'repo' permission)</div>
+    </div>
+
+    <div class="form-group">
+      <label>Photo</label>
+      <input type="file" id="photo" accept="image/*" required>
+      <img id="preview" class="preview" style="display: none;">
+    </div>
+
+    <div class="form-group">
+      <label>Caption</label>
+      <textarea id="caption" required placeholder="Late night coding session"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Audio (MP3)</label>
+      <input type="file" id="audio" accept="audio/mp3,audio/mpeg">
+      <div class="info">Optional - background music for this photo</div>
+    </div>
+
+    <div class="form-group">
+      <label>Song Title</label>
+      <input type="text" id="song" placeholder="Blinding Lights">
+    </div>
+
+    <div class="form-group">
+      <label>Artist Name</label>
+      <input type="text" id="artist" placeholder="The Weeknd">
+    </div>
+
+    <button type="submit" id="submitBtn">Process & Upload to GitHub</button>
+  </form>
+
+  <div id="status" class="status"></div>
+    </section>
+  </main>
+
+  <script>
+    const GITHUB_USER = 'nicholascsmith';
+    const GITHUB_REPO = 'ncarters';
+    const GITHUB_API = 'https://api.github.com';
+
+    // Preview image when selected
+    document.getElementById('photo').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const preview = document.getElementById('preview');
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Handle form submission
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const token = document.getElementById('token').value;
+      const photoFile = document.getElementById('photo').files[0];
+      const audioFile = document.getElementById('audio').files[0];
+      const song = document.getElementById('song').value;
+      const artist = document.getElementById('artist').value;
+      const caption = document.getElementById('caption').value;
+      const submitBtn = document.getElementById('submitBtn');
+      const status = document.getElementById('status');
+
+      if (!photoFile) {
+        showStatus('Please select a photo', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Processing...';
+      status.style.display = 'none';
+
+      try {
+        // Step 1: Convert image to high-quality JPG
+        showStatus('Converting image to JPG...', 'success');
+        const jpgBlob = await convertToJPG(photoFile);
+
+        // Step 2: Generate filename (timestamp-based)
+        const timestamp = Date.now();
+        const filename = `photo${timestamp}.jpg`;
+
+        // Step 3: Convert to base64
+        showStatus('Preparing upload...', 'success');
+        const base64Data = await blobToBase64(jpgBlob);
+
+        // Step 4: Handle audio file if provided
+        let audioFilename = null;
+        if (audioFile) {
+          showStatus('Processing audio file...', 'success');
+          audioFilename = `audio${timestamp}.mp3`;
+          const audioBase64 = await blobToBase64(audioFile);
+
+          showStatus('Uploading audio to GitHub...', 'success');
+          await uploadFile(token, `photos/${audioFilename}`, audioBase64, 'Add audio file');
+        }
+
+        // Step 5: Get current photos.json
+        showStatus('Reading photos.json...', 'success');
+        const photosJson = await getPhotosJson(token);
+
+        // Step 6: Add new photo entry
+        const photoEntry = {
+          file: filename,
+          song: song || 'Untitled',
+          artist: artist || 'Unknown Artist',
+          caption: caption
+        };
+        if (audioFilename) {
+          photoEntry.audio = audioFilename;
+        }
+        photosJson.push(photoEntry);
+
+        // Step 7: Upload JPG to GitHub
+        showStatus('Uploading photo to GitHub...', 'success');
+        await uploadFile(token, `photos/${filename}`, base64Data, 'Add new photo');
+
+        // Step 8: Update photos.json
+        showStatus('Updating photos.json...', 'success');
+        const photosJsonB64 = btoa(JSON.stringify(photosJson, null, 2));
+        await updatePhotosJson(token, photosJsonB64);
+
+        // Success!
+        showStatus('✅ Success! Photo uploaded to ncarters.com', 'success');
+        submitBtn.textContent = 'Upload Another Photo';
+        document.getElementById('uploadForm').reset();
+        document.getElementById('preview').style.display = 'none';
+
+      } catch (error) {
+        console.error(error);
+        showStatus(`❌ Error: ${error.message}`, 'error');
+        submitBtn.textContent = 'Try Again';
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Convert any image format to high-quality JPG
+    function convertToJPG(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+
+            canvas.toBlob((blob) => {
+              resolve(blob);
+            }, 'image/jpeg', 0.85); // 85% quality
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Convert blob to base64
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result.split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    // Get current photos.json from GitHub
+    async function getPhotosJson(token) {
+      try {
+        const response = await fetch(
+          `${GITHUB_API}/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/photos.json`,
+          {
+            headers: {
+              'Authorization': `token ${token}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          }
+        );
+
+        if (!response.ok) {
+          // If file doesn't exist, return empty array
+          if (response.status === 404) {
+            return [];
+          }
+          throw new Error(`GitHub API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const content = atob(data.content);
+        return JSON.parse(content);
+      } catch (error) {
+        console.error('Error reading photos.json:', error);
+        return [];
+      }
+    }
+
+    // Upload file to GitHub
+    async function uploadFile(token, path, base64Content, message) {
+      const response = await fetch(
+        `${GITHUB_API}/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: message,
+            content: base64Content
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to upload file');
+      }
+
+      return response.json();
+    }
+
+    // Update photos.json on GitHub
+    async function updatePhotosJson(token, base64Content) {
+      // Get current file SHA (required for update)
+      const getResponse = await fetch(
+        `${GITHUB_API}/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/photos.json`,
+        {
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        }
+      );
+
+      let sha = null;
+      if (getResponse.ok) {
+        const data = await getResponse.json();
+        sha = data.sha;
+      }
+
+      const response = await fetch(
+        `${GITHUB_API}/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/photos.json`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: 'Update photos.json',
+            content: base64Content,
+            sha: sha
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update photos.json');
+      }
+
+      return response.json();
+    }
+
+    // Show status message
+    function showStatus(message, type) {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.className = `status ${type}`;
+    }
+  </script>
+</body>
+</html>
