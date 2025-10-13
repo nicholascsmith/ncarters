@@ -75,15 +75,4 @@ li::before { content: "> "; color: var(--text-dim); position: absolute; left: 0;
   opacity: 0.8;
 }
 
-@media (max-width: 600px) {
-  .photo-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 400px) {
-  .photo-grid {
-    grid-template-columns: 1fr;
-  }
-}
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Photo Upload - ncarters</title>
+  <title>New Post</title>
   <link rel="stylesheet" href="styles.css">
   <style>
     .form-group { margin: var(--space-lg) 0; }
@@ -16,7 +16,7 @@
       color: var(--text);
       font-size: 1rem;
       font-family: system-ui, sans-serif;
-      border-radius: 4px;
+      border-radius: 0;
     }
     textarea { resize: vertical; min-height: 100px; }
     button {
@@ -29,9 +29,9 @@
       font-weight: 600;
       cursor: pointer;
       margin-top: var(--space-lg);
-      border-radius: 4px;
+      border-radius: 0;
     }
-    button:hover { opacity: 0.8; }
+    button:hover { opacity: 0.6; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
     .status {
       margin-top: var(--space-lg);
@@ -41,20 +41,18 @@
     }
     .status.success { display: block; }
     .status.error { display: block; color: #ff6b6b; }
-    .preview { max-width: 100%; margin-top: var(--space-md); }
-    .info { font-size: 0.9rem; color: var(--text-dim); margin-top: var(--space-xs); }
+    .preview { max-width: 50%; margin-top: var(--space-md); }
   </style>
 </head>
 <body>
   <main>
     <section>
-      <h1>Upload Photo</h1>
+      <h1>New Post</h1>
 
   <form id="uploadForm">
     <div class="form-group">
       <label>GitHub Personal Access Token</label>
       <input type="password" id="token" required placeholder="ghp_...">
-      <div class="info">Create at: github.com/settings/tokens (needs 'repo' permission)</div>
     </div>
 
     <div class="form-group">
@@ -65,23 +63,22 @@
 
     <div class="form-group">
       <label>Caption</label>
-      <textarea id="caption" required placeholder="Late night coding session"></textarea>
+      <textarea id="caption" required placeholder="Caption"></textarea>
     </div>
 
     <div class="form-group">
       <label>Audio (MP3)</label>
       <input type="file" id="audio" accept="audio/mp3,audio/mpeg">
-      <div class="info">Optional - background music for this photo</div>
     </div>
 
     <div class="form-group">
       <label>Song Title</label>
-      <input type="text" id="song" placeholder="Blinding Lights">
+      <input type="text" id="song" placeholder="Song">
     </div>
 
     <div class="form-group">
       <label>Artist Name</label>
-      <input type="text" id="artist" placeholder="The Weeknd">
+      <input type="text" id="artist" placeholder="Artist">
     </div>
 
     <button type="submit" id="submitBtn">Process & Upload to GitHub</button>
@@ -182,8 +179,8 @@
         await updatePhotosJson(token, photosJsonB64, currentSha);
 
         // Success!
-        showStatus('✅ Success! Photo uploaded to ncarters.com', 'success');
-        submitBtn.textContent = 'Upload Another Photo';
+        showStatus('✅ Success! Post uploaded to ncarters.com', 'success');
+        submitBtn.textContent = 'Upload Another Post';
         document.getElementById('uploadForm').reset();
         document.getElementById('preview').style.display = 'none';
 

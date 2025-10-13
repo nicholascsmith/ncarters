@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Photo - ncarters</title>
+  <title id="pageTitle">ncarters</title>
   <link rel="stylesheet" href="styles.css">
   <style>
     .photo-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
-    .photo-pfp { width: 40px; height: 40px; border-radius: 50%; }
+    .photo-pfp { width: 60px; height: 60px; border-radius: 50%; }
     .photo-info { display: flex; flex-direction: column; gap: var(--space-xs); }
-    .photo-username { font-weight: 600; font-size: 0.95rem; }
-    .photo-music { font-size: 0.8rem; color: var(--text-dim); }
+    .photo-username { font-weight: 600; font-size: 1rem; }
+    .photo-music { font-size: 1rem; color: var(--text-dim); }
     .photo-container { position: relative; cursor: pointer; }
     .photo-view { max-width: 100%; height: auto; display: block; }
     .mute-indicator {
       position: absolute;
-      top: 12px;
+      bottom: 12px;
       right: 12px;
       width: 32px;
       height: 32px;
@@ -29,6 +29,7 @@
     .mute-indicator svg { width: 16px; height: 16px; fill: #fff; }
     .caption { margin-top: var(--space-lg); }
     .caption strong { font-weight: 600; }
+    .back-link { display: inline-block; margin-top: var(--space-lg); color: var(--text); text-decoration: none; }
   </style>
 </head>
 <body>
@@ -50,6 +51,7 @@
         </div>
       </div>
       <p class="caption"><strong>ncarters</strong> Photo caption goes here.</p>
+      <a href="/" class="back-link">← Back</a>
       <audio id="audio" loop></audio>
     </section>
   </main>
@@ -71,6 +73,7 @@
     }
     if (caption) {
       document.querySelector('.caption').innerHTML = `<strong>ncarters</strong> ${caption}`;
+      document.getElementById('pageTitle').textContent = caption;
     }
 
     // Handle audio if provided
