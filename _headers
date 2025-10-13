@@ -1,12 +1,5 @@
-/upload.html
-  Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; connect-src https://api.github.com https://static.cloudflareinsights.com
-  X-Frame-Options: DENY
-  X-Content-Type-Options: nosniff
-  Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: geolocation=(), microphone=(), camera=()
-
 /*
-  Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; script-src 'unsafe-inline' https://ncarters.com https://*.cloudflareinsights.com https://ncarters.com/cdn-cgi/*; connect-src https://ncarters.com https://*.cloudflareinsights.com https://ncarters.com/cdn-cgi/*
+  Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self' 'unsafe-inline' https://*.cloudflareinsights.com https://ncarters.com/cdn-cgi/*; connect-src https://ncarters.com https://*.cloudflareinsights.com https://ncarters.com/cdn-cgi/* https://api.github.com
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
