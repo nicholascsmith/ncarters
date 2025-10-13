@@ -248,7 +248,7 @@
           `${GITHUB_API}/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/photos.json`,
           {
             headers: {
-              'Authorization': `token ${token}`,
+              'Authorization': `Bearer ${token}`,
               'Accept': 'application/vnd.github.v3+json'
             }
           }
@@ -278,7 +278,7 @@
         {
           method: 'PUT',
           headers: {
-            'Authorization': `token ${token}`,
+            'Authorization': `Bearer ${token}`,
             'Accept': 'application/vnd.github.v3+json',
             'Content-Type': 'application/json'
           },
@@ -304,7 +304,7 @@
         {
           method: 'PUT',
           headers: {
-            'Authorization': `token ${token}`,
+            'Authorization': `Bearer ${token}`,
             'Accept': 'application/vnd.github.v3+json',
             'Content-Type': 'application/json'
           },
