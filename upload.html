@@ -156,11 +156,15 @@
           await uploadFile(token, `photos/${audioFilename}`, audioBase64, 'Add audio file');
         }
 
-        // Step 5: Get current photos.json
-        showStatus('Reading photos.json...', 'success');
-        const photosJson = await getPhotosJson(token);
+        // Step 5: Upload JPG to GitHub first
+        showStatus('Uploading photo to GitHub...', 'success');
+        await uploadFile(token, `photos/${filename}`, base64Data, 'Add new photo');
 
-        // Step 6: Add new photo entry
+        // Step 6: Get current photos.json with SHA (after all file uploads)
+        showStatus('Reading photos.json...', 'success');
+        const { content: photosJson, sha: currentSha } = await getPhotosJsonWithSha(token);
+
+        // Step 7: Add new photo entry
         const photoEntry = {
           file: filename,
           song: song || 'Untitled',
@@ -172,14 +176,10 @@
         }
         photosJson.push(photoEntry);
 
-        // Step 7: Upload JPG to GitHub
-        showStatus('Uploading photo to GitHub...', 'success');
-        await uploadFile(token, `photos/${filename}`, base64Data, 'Add new photo');
-
-        // Step 8: Update photos.json
+        // Step 8: Update photos.json with the SHA we just got
         showStatus('Updating photos.json...', 'success');
         const photosJsonB64 = btoa(JSON.stringify(photosJson, null, 2));
-        await updatePhotosJson(token, photosJsonB64);
+        await updatePhotosJson(token, photosJsonB64, currentSha);
 
         // Success!
         showStatus('✅ Success! Photo uploaded to ncarters.com', 'success');
@@ -237,8 +237,8 @@
       });
     }
 
-    // Get current photos.json from GitHub
-    async function getPhotosJson(token) {
+    // Get current photos.json with SHA from GitHub
+    async function getPhotosJsonWithSha(token) {
       try {
         const response = await fetch(
           `${GITHUB_API}/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/photos.json`,
@@ -251,19 +251,19 @@
         );
 
         if (!response.ok) {
-          // If file doesn't exist, return empty array
+          // If file doesn't exist, return empty array with null SHA
           if (response.status === 404) {
-            return [];
+            return { content: [], sha: null };
           }
           throw new Error(`GitHub API error: ${response.status}`);
         }
 
         const data = await response.json();
-        const content = atob(data.content);
-        return JSON.parse(content);
+        const content = atob(data.content.replace(/\n/g, ''));
+        return { content: JSON.parse(content), sha: data.sha };
       } catch (error) {
         console.error('Error reading photos.json:', error);
-        return [];
+        return { content: [], sha: null };
       }
     }
 
@@ -293,25 +293,8 @@
       return response.json();
     }
 
-    // Update photos.json on GitHub
-    async function updatePhotosJson(token, base64Content) {
-      // Get current file SHA (required for update)
-      const getResponse = await fetch(
-        `${GITHUB_API}/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/photos.json`,
-        {
-          headers: {
-            'Authorization': `token ${token}`,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        }
-      );
-
-      let sha = null;
-      if (getResponse.ok) {
-        const data = await getResponse.json();
-        sha = data.sha;
-      }
-
+    // Update photos.json on GitHub with provided SHA
+    async function updatePhotosJson(token, base64Content, sha) {
       const response = await fetch(
         `${GITHUB_API}/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/photos.json`,
         {
