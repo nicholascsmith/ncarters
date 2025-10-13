@@ -63,12 +63,12 @@
 
     <div class="form-group">
       <label>Caption</label>
-      <textarea id="caption" required placeholder="Caption"></textarea>
+      <textarea id="caption" placeholder="Caption"></textarea>
     </div>
 
     <div class="form-group">
-      <label>Audio (MP3)</label>
-      <input type="file" id="audio" accept="audio/mp3,audio/mpeg">
+      <label>Audio (MP3/M4A)</label>
+      <input type="file" id="audio" accept="audio/mp3,audio/mpeg,audio/mp4,audio/x-m4a">
     </div>
 
     <div class="form-group">
@@ -146,7 +146,9 @@
         let audioFilename = null;
         if (audioFile) {
           showStatus('Processing audio file...', 'success');
-          audioFilename = `audio${timestamp}.mp3`;
+          // Preserve original file extension (mp3 or m4a)
+          const audioExt = audioFile.name.split('.').pop().toLowerCase();
+          audioFilename = `audio${timestamp}.${audioExt}`;
           const audioBase64 = await blobToBase64(audioFile);
 
           showStatus('Uploading audio to GitHub...', 'success');
@@ -166,7 +168,7 @@
           file: filename,
           song: song || 'Untitled',
           artist: artist || 'Unknown Artist',
-          caption: caption
+          caption: caption || ''
         };
         if (audioFilename) {
           photoEntry.audio = audioFilename;
@@ -175,7 +177,7 @@
 
         // Step 8: Update photos.json with the SHA we just got
         showStatus('Updating photos.json...', 'success');
-        const photosJsonB64 = btoa(JSON.stringify(photosJson, null, 2));
+        const photosJsonB64 = utf8ToBase64(JSON.stringify(photosJson, null, 2));
         await updatePhotosJson(token, photosJsonB64, currentSha);
 
         // Success!
@@ -232,6 +234,11 @@
         reader.onerror = reject;
         reader.readAsDataURL(blob);
       });
+    }
+
+    // Convert UTF-8 string to base64 (handles Unicode characters like Spanish accents)
+    function utf8ToBase64(str) {
+      return btoa(unescape(encodeURIComponent(str)));
     }
 
     // Get current photos.json with SHA from GitHub

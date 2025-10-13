@@ -9,7 +9,7 @@
     .photo-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
     .photo-pfp { width: 60px; height: 60px; border-radius: 50%; }
     .photo-info { display: flex; flex-direction: column; gap: var(--space-xs); }
-    .photo-username { font-weight: 600; font-size: 1rem; }
+    .photo-username { font-weight: 600; font-size: 1rem; color: var(--text); text-decoration: none; }
     .photo-music { font-size: 1rem; color: var(--text-dim); }
     .photo-container { position: relative; cursor: pointer; }
     .photo-view { max-width: 100%; height: auto; display: block; }
@@ -29,16 +29,18 @@
     .mute-indicator svg { width: 16px; height: 16px; fill: #fff; }
     .caption { margin-top: var(--space-lg); }
     .caption strong { font-weight: 600; }
-    .back-link { display: inline-block; margin-top: var(--space-lg); color: var(--text); text-decoration: none; }
+    .back-link { display: inline-block; margin-top: var(--space-lg); color: var(--text); text-decoration: none; font-weight: 600; }
   </style>
 </head>
 <body>
   <main>
     <section>
       <div class="photo-header">
-        <img src="photos/profile.jpg" alt="Profile" class="photo-pfp">
+        <a href="/">
+          <img src="photos/profile.jpg" alt="Profile" class="photo-pfp">
+        </a>
         <div class="photo-info">
-          <div class="photo-username">ncarters</div>
+          <a href="/" class="photo-username">ncarters</a>
           <div class="photo-music">♫ Song Title • Artist Name</div>
         </div>
       </div>
@@ -50,7 +52,7 @@
           </svg>
         </div>
       </div>
-      <p class="caption"><strong>ncarters</strong> Photo caption goes here.</p>
+      <p class="caption">Photo caption goes here.</p>
       <a href="/" class="back-link">← Back</a>
       <audio id="audio" loop></audio>
     </section>
@@ -72,7 +74,7 @@
       document.querySelector('.photo-music').textContent = `♫ ${song} • ${artist}`;
     }
     if (caption) {
-      document.querySelector('.caption').innerHTML = `<strong>ncarters</strong> ${caption}`;
+      document.querySelector('.caption').textContent = caption;
       document.getElementById('pageTitle').textContent = caption;
     }
 
