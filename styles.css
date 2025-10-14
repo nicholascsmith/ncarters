@@ -57,8 +57,7 @@ li::before { content: "> "; color: var(--text-dim); position: absolute; left: 0;
 .post-pfp { width: var(--pfp-size); height: var(--pfp-size); border-radius: 50%; }
 .post-info { display: flex; flex-direction: column; overflow: hidden; position: relative; }
 .post-username { font-size: 1rem; font-weight: 600; text-decoration: none; }
-.post-music { font-size: 1rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; animation: scroll-text 12s linear infinite; mask-image: linear-gradient(to right, transparent, black 20px, black calc(100% - 20px), transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 20px, black calc(100% - 20px), transparent); }
-@keyframes scroll-text { 0%, 10% { transform: translateX(0); } 90%, 100% { transform: translateX(-100%); } }
+.post-music { font-size: 1rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .post-container { position: relative; margin: var(--space-md) 0; cursor: pointer; }
 .post-view { max-width: 100%; height: auto; display: block; }
 .mute-indicator { position: absolute; bottom: var(--space-sm); right: var(--space-sm); width: var(--icon-size); height: var(--icon-size); background: rgba(0, 0, 0, 0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
