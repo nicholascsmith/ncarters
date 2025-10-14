@@ -9,15 +9,10 @@ fetch('posts.json')
 
     // Build post grid HTML
     grid.innerHTML = posts.map(post => {
-      const params = new URLSearchParams({
-        src: `photos/${post.file}`,
-        song: post.song,
-        artist: post.artist,
-        caption: post.caption
-      });
-      if (post.audio) params.set('audio', post.audio);
+      // Use filename (without extension) as post ID
+      const postId = post.file.replace(/\.[^/.]+$/, '');
 
-      return `<a href="post.html?${params}" class="post-item">
+      return `<a href="post.html?id=${postId}" class="post-item">
         <img src="photos/${post.file}" alt="${escape(post.caption)}" loading="lazy">
       </a>`;
     }).join('');
