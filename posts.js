@@ -7,13 +7,13 @@ fetch('posts.json')
     // HTML escape helper for security
     const escape = str => (str || '').replace(/[&<>"']/g, m => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;'})[m]);
 
-    // Build post grid HTML
-    grid.innerHTML = posts.map(post => {
+    // Build post grid HTML (reverse to show newest first)
+    grid.innerHTML = posts.reverse().map(post => {
       // Use filename (without extension) as post ID
       const postId = post.file.replace(/\.[^/.]+$/, '');
 
       return `<a href="post.html?id=${postId}" class="post-item">
-        <img src="photos/${post.file}" alt="${escape(post.caption)}" loading="lazy">
+        <img src="media/${post.file}" alt="${escape(post.caption)}" loading="lazy">
       </a>`;
     }).join('');
   })

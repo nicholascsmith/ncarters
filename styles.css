@@ -55,9 +55,10 @@ li::before { content: "> "; color: var(--text-dim); position: absolute; left: 0;
 .back-link { display: inline-block; margin: 0 0 var(--space-lg); font-weight: 700; font-size: 1.5rem; }
 .post-header { display: flex; align-items: center; gap: var(--space-md); margin: 0 0 var(--space-md); }
 .post-pfp { width: var(--pfp-size); height: var(--pfp-size); border-radius: 50%; }
-.post-info { display: flex; flex-direction: column; }
+.post-info { display: flex; flex-direction: column; overflow: hidden; position: relative; }
 .post-username { font-size: 1rem; font-weight: 600; text-decoration: none; }
-.post-music { font-size: 1rem; color: var(--text-dim); }
+.post-music { font-size: 1rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; animation: scroll-text 12s linear infinite; mask-image: linear-gradient(to right, transparent, black 20px, black calc(100% - 20px), transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 20px, black calc(100% - 20px), transparent); }
+@keyframes scroll-text { 0%, 10% { transform: translateX(0); } 90%, 100% { transform: translateX(-100%); } }
 .post-container { position: relative; margin: var(--space-md) 0; cursor: pointer; }
 .post-view { max-width: 100%; height: auto; display: block; }
 .mute-indicator { position: absolute; bottom: var(--space-sm); right: var(--space-sm); width: var(--icon-size); height: var(--icon-size); background: rgba(0, 0, 0, 0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
@@ -80,9 +81,6 @@ button:disabled { cursor: not-allowed; }
 .spinner { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--bg); animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite; margin-right: var(--space-sm); vertical-align: middle; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-.status { margin: var(--space-lg) 0 0; padding: var(--space-md); border: 1px solid var(--text-dim); }
-.status:empty { display: none; }
-.status.error { color: #ff6b6b; }
 .preview { max-width: 50%; margin: var(--space-md) 0 0; }
 .hidden { display: none; }
 

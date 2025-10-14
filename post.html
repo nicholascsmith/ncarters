@@ -12,7 +12,7 @@
       <a href="/#posts" class="back-link link-invert">← Back</a>
       <div class="post-header">
         <a href="/#posts">
-          <img src="photos/profile.jpg" alt="Profile" class="post-pfp">
+          <img src="media/profile.jpg" alt="Profile" class="post-pfp">
         </a>
         <div class="post-info">
           <a href="/#posts" class="post-username">Nicholas</a>
@@ -58,15 +58,21 @@
             return;
           }
 
-          el.post.src = `photos/${post.file}`;
-          el.music.textContent = `♫ ${post.song} • ${post.artist}`;
+          el.post.src = `media/${post.file}`;
+
+          if (post.song && post.artist) {
+            el.music.textContent = `♫ ${post.song} • ${post.artist}`;
+          } else {
+            el.music.style.display = 'none';
+          }
+
           if (post.caption) {
             el.caption.textContent = post.caption;
             el.title.textContent = post.caption;
           }
 
           if (post.audio) {
-            el.audio.src = `photos/${post.audio}`;
+            el.audio.src = `media/${post.audio}`;
             el.audio.muted = true;
             el.muteIndicator.innerHTML = MUTED_ICON;
             el.audio.play().catch(() => {});

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>New Post</title>
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -48,8 +48,6 @@
 
     <button type="submit" id="submitBtn">Upload</button>
   </form>
-
-  <div id="status" class="status"></div>
     </section>
   </main>
 
@@ -67,7 +65,6 @@
       artist: document.getElementById('artist'),
       caption: document.getElementById('caption'),
       submitBtn: document.getElementById('submitBtn'),
-      status: document.getElementById('status'),
       preview: document.getElementById('preview')
     };
 
@@ -112,7 +109,7 @@
       const file = e.target.files[0];
       if (file) {
         if (file.size > MAX_PHOTO_SIZE) {
-          showStatus('Photo must be under 10MB', 'error');
+          alert('Photo must be under 10MB');
           el.photo.value = '';
           return;
         }
@@ -124,7 +121,7 @@
     el.audio.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file && file.size > MAX_AUDIO_SIZE) {
-        showStatus('Audio must be under 15MB', 'error');
+        alert('Audio must be under 15MB');
         el.audio.value = '';
       }
     });
@@ -136,7 +133,7 @@
       const now = Date.now();
       if (now - lastUploadTime < UPLOAD_COOLDOWN) {
         const secondsLeft = Math.ceil((UPLOAD_COOLDOWN - (now - lastUploadTime)) / 1000);
-        showStatus(`Please wait ${secondsLeft} seconds before uploading again`, 'error');
+        alert(`Please wait ${secondsLeft} seconds before uploading again`);
         return;
       }
 
@@ -148,26 +145,25 @@
       const caption = el.caption.value.slice(0, MAX_TEXT_LENGTH);
 
       if (!photoFile) {
-        showStatus('Please select a photo', 'error');
+        alert('Please select a photo');
         return;
       }
 
       if (photoFile.size > MAX_PHOTO_SIZE) {
-        showStatus('Photo must be under 10MB', 'error');
+        alert('Photo must be under 10MB');
         return;
       }
 
       if (audioFile && audioFile.size > MAX_AUDIO_SIZE) {
-        showStatus('Audio must be under 15MB', 'error');
+        alert('Audio must be under 15MB');
         return;
       }
 
       el.submitBtn.disabled = true;
-      el.submitBtn.innerHTML = '<span class="spinner"></span>Processing';
 
       try {
         // Step 1: Convert image to high-quality JPG
-        showStatus('Converting image to JPG...', 'success');
+        el.submitBtn.innerHTML = '<span class="spinner"></span>Converting image to JPG';
         const jpgBlob = await convertToJPG(photoFile);
 
         // Step 2: Generate random filename
@@ -175,48 +171,46 @@
         const filename = `photo${randomId}.jpg`;
 
         // Step 3: Convert to base64
-        showStatus('Preparing upload...', 'success');
+        el.submitBtn.innerHTML = '<span class="spinner"></span>Preparing upload';
         const base64Data = await blobToBase64(jpgBlob);
 
         // Step 4: Handle audio file if provided
         let audioFilename = null;
         if (audioFile) {
-          showStatus('Processing audio file...', 'success');
+          el.submitBtn.innerHTML = '<span class="spinner"></span>Processing audio file';
           const audioExt = audioFile.name.substring(audioFile.name.lastIndexOf('.') + 1).toLowerCase();
           const audioId = crypto.randomUUID().substring(0, 8);
           audioFilename = `audio${audioId}.${audioExt}`;
           const audioBase64 = await blobToBase64(audioFile);
 
-          showStatus('Uploading audio to GitHub...', 'success');
-          await uploadFile(token, `photos/${audioFilename}`, audioBase64, '🤖 Add audio track');
+          el.submitBtn.innerHTML = '<span class="spinner"></span>Uploading audio to GitHub';
+          await uploadFile(token, `media/${audioFilename}`, audioBase64, '🤖 Add audio track');
         }
 
         // Step 5: Upload JPG to GitHub first
-        showStatus('Uploading photo to GitHub...', 'success');
-        await uploadFile(token, `photos/${filename}`, base64Data, '🤖 Add new photo');
+        el.submitBtn.innerHTML = '<span class="spinner"></span>Uploading photo to GitHub';
+        await uploadFile(token, `media/${filename}`, base64Data, '🤖 Add new photo');
 
         // Step 6: Get current posts.json with SHA (after all file uploads)
-        showStatus('Reading posts.json...', 'success');
-        const { content: photosJson, sha: currentSha } = await getPhotosJsonWithSha(token);
+        el.submitBtn.innerHTML = '<span class="spinner"></span>Reading posts.json';
+        const { content: postsJson, sha: currentSha } = await getPostsJsonWithSha(token);
 
-        // Step 7: Add new photo entry
-        const photoEntry = {
-          file: filename,
-          song: song || 'Untitled',
-          artist: artist || 'Unknown Artist'
-        };
-        if (caption) photoEntry.caption = caption;
-        if (audioFilename) photoEntry.audio = audioFilename;
-        photosJson.push(photoEntry);
+        // Step 7: Add new post entry
+        const postEntry = { file: filename };
+        if (song) postEntry.song = song;
+        if (artist) postEntry.artist = artist;
+        if (caption) postEntry.caption = caption;
+        if (audioFilename) postEntry.audio = audioFilename;
+        postsJson.push(postEntry);
 
         // Step 8: Update posts.json with the SHA we just got
-        showStatus('Updating posts.json...', 'success');
-        const photosJsonB64 = utf8ToBase64(JSON.stringify(photosJson, null, 2));
-        await updatePhotosJson(token, photosJsonB64, currentSha);
+        el.submitBtn.innerHTML = '<span class="spinner"></span>Updating posts.json';
+        const postsJsonB64 = utf8ToBase64(JSON.stringify(postsJson, null, 2));
+        await updatePostsJson(token, postsJsonB64, currentSha);
 
         // Success! Update rate limit timestamp
         lastUploadTime = Date.now();
-        showStatus('Success! Your post will appear within a few minutes.', 'success');
+        el.submitBtn.textContent = 'Success! Post will appear soon';
 
         // Clear token from memory
         el.token.value = '';
@@ -224,21 +218,19 @@
         el.form.reset();
         el.preview.classList.add('hidden');
 
+        // Re-enable button after 5 seconds
+        setTimeout(() => {
+          el.submitBtn.disabled = false;
+          el.submitBtn.textContent = 'Upload';
+        }, 5000);
+
       } catch (error) {
         console.error(error);
-        // Generic error message for users, detailed error in console
-        if (error.message.includes('401') || error.message.includes('403')) {
-          showStatus('Authentication failed. Please check your password.', 'error');
-        } else if (error.message.includes('404')) {
-          showStatus('Repository not found. Please check configuration.', 'error');
-        } else if (error.message.includes('422')) {
-          showStatus('Upload failed. File may already exist or be invalid.', 'error');
-        } else {
-          showStatus('Upload failed. Please try again.', 'error');
-        }
-      } finally {
-        el.submitBtn.disabled = false;
-        el.submitBtn.textContent = 'Upload';
+        el.submitBtn.textContent = 'Upload failed - Try again';
+        setTimeout(() => {
+          el.submitBtn.disabled = false;
+          el.submitBtn.textContent = 'Upload';
+        }, 5000);
       }
     });
 
@@ -277,7 +269,7 @@
     }
 
     // Get current posts.json with SHA from GitHub
-    async function getPhotosJsonWithSha(token) {
+    async function getPostsJsonWithSha(token) {
       try {
         const data = await githubFetch(token, 'posts.json');
         const content = atob(data.content.replace(/\n/g, ''));
@@ -297,7 +289,7 @@
     }
 
     // Update posts.json on GitHub with provided SHA
-    function updatePhotosJson(token, base64Content, sha) {
+    function updatePostsJson(token, base64Content, sha) {
       return githubFetch(token, 'posts.json', {
         method: 'PUT',
         body: JSON.stringify({
@@ -306,12 +298,6 @@
           sha
         })
       });
-    }
-
-    // Show status message
-    function showStatus(message, type) {
-      el.status.textContent = message;
-      el.status.className = `status ${type}`;
     }
   </script>
 </body>
