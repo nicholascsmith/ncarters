@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>New Post</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -97,9 +99,9 @@
       return response.json();
     }
 
-    // Rate limiting - 30 second cooldown between uploads
+    // Rate limiting - 10 second cooldown between uploads
     let lastUploadTime = 0;
-    const UPLOAD_COOLDOWN = 30000; // 30 seconds
+    const UPLOAD_COOLDOWN = 10000; // 10 seconds
 
     // File size limits
     const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB
@@ -161,7 +163,7 @@
       }
 
       el.submitBtn.disabled = true;
-      el.submitBtn.textContent = 'Processing...';
+      el.submitBtn.innerHTML = '<span class="spinner"></span>Processing';
 
       try {
         // Step 1: Convert image to high-quality JPG
@@ -215,6 +217,10 @@
         // Success! Update rate limit timestamp
         lastUploadTime = Date.now();
         showStatus('Success! Your post will appear within a few minutes.', 'success');
+
+        // Clear token from memory
+        el.token.value = '';
+
         el.form.reset();
         el.preview.classList.add('hidden');
 
