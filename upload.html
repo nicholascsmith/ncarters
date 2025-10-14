@@ -2,86 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>New Post</title>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    .form-group { margin: var(--space-lg) 0; }
-    label { display: block; margin-bottom: var(--space-sm); font-weight: 600; }
-    input[type="text"], input[type="password"], textarea, input[type="file"] {
-      width: 100%;
-      padding: var(--space-md);
-      border: 1px solid var(--text-dim);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 1rem;
-      font-family: system-ui, sans-serif;
-      border-radius: 0;
-    }
-    textarea { resize: vertical; min-height: 100px; }
-    button {
-      width: 100%;
-      padding: var(--space-md);
-      background: var(--text);
-      color: var(--bg);
-      border: none;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: var(--space-lg);
-      border-radius: 0;
-    }
-    button:hover { opacity: 0.8; }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .status {
-      margin-top: var(--space-lg);
-      padding: var(--space-md);
-      display: none;
-      border: 1px solid var(--text-dim);
-    }
-    .status.success { display: block; }
-    .status.error { display: block; color: #ff6b6b; }
-    .preview { max-width: 50%; margin-top: var(--space-md); }
-  </style>
 </head>
 <body>
   <main>
     <section>
+      <a href="/" class="back-link link-invert">← Back</a>
       <h1>New Post</h1>
 
   <form id="uploadForm">
     <div class="form-group">
-      <label>GitHub Personal Access Token</label>
-      <input type="password" id="token" required placeholder="ghp_...">
+      <label for="token">Password</label>
+      <input type="password" id="token" required placeholder="Password">
     </div>
 
     <div class="form-group">
-      <label>Photo</label>
+      <label for="photo">Photo</label>
       <input type="file" id="photo" accept="image/*" required>
-      <img id="preview" class="preview" style="display: none;">
+      <img id="preview" class="preview hidden">
     </div>
 
     <div class="form-group">
-      <label>Caption</label>
+      <label for="caption">Caption</label>
       <textarea id="caption" placeholder="Caption"></textarea>
     </div>
 
     <div class="form-group">
-      <label>Audio (MP3/M4A)</label>
+      <label for="audio">Audio (MP3/M4A)</label>
       <input type="file" id="audio" accept="audio/mp3,audio/mpeg,audio/mp4,audio/x-m4a">
     </div>
 
     <div class="form-group">
-      <label>Song Title</label>
-      <input type="text" id="song" placeholder="Song">
+      <label for="song">Song Title</label>
+      <input type="text" id="song" placeholder="Song Title">
     </div>
 
     <div class="form-group">
-      <label>Artist Name</label>
-      <input type="text" id="artist" placeholder="Artist">
+      <label for="artist">Artist Name</label>
+      <input type="text" id="artist" placeholder="Artist Name">
     </div>
 
-    <button type="submit" id="submitBtn">Process & Upload to GitHub</button>
+    <button type="submit" id="submitBtn">Upload</button>
   </form>
 
   <div id="status" class="status"></div>
@@ -93,50 +56,121 @@
     const GITHUB_REPO = 'ncarters';
     const GITHUB_API = 'https://api.github.com';
 
-    // Preview image when selected
-    document.getElementById('photo').addEventListener('change', (e) => {
+    const el = {
+      form: document.getElementById('uploadForm'),
+      photo: document.getElementById('photo'),
+      audio: document.getElementById('audio'),
+      token: document.getElementById('token'),
+      song: document.getElementById('song'),
+      artist: document.getElementById('artist'),
+      caption: document.getElementById('caption'),
+      submitBtn: document.getElementById('submitBtn'),
+      status: document.getElementById('status'),
+      preview: document.getElementById('preview')
+    };
+
+    function readFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function githubFetch(token, path, options = {}) {
+      const response = await fetch(`${GITHUB_API}/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`, {
+        ...options,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+          ...options.headers
+        }
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || `GitHub API error: ${response.status}`);
+      }
+
+      return response.json();
+    }
+
+    // Rate limiting - 30 second cooldown between uploads
+    let lastUploadTime = 0;
+    const UPLOAD_COOLDOWN = 30000; // 30 seconds
+
+    // File size limits
+    const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB
+    const MAX_AUDIO_SIZE = 15 * 1024 * 1024; // 15MB
+    const MAX_TEXT_LENGTH = 500;
+
+    el.photo.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const preview = document.getElementById('preview');
-          preview.src = e.target.result;
-          preview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+        if (file.size > MAX_PHOTO_SIZE) {
+          showStatus('Photo must be under 10MB', 'error');
+          el.photo.value = '';
+          return;
+        }
+        el.preview.src = await readFile(file);
+        el.preview.classList.remove('hidden');
       }
     });
 
-    // Handle form submission
-    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+    el.audio.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.size > MAX_AUDIO_SIZE) {
+        showStatus('Audio must be under 15MB', 'error');
+        el.audio.value = '';
+      }
+    });
+
+    el.form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const token = document.getElementById('token').value;
-      const photoFile = document.getElementById('photo').files[0];
-      const audioFile = document.getElementById('audio').files[0];
-      const song = document.getElementById('song').value;
-      const artist = document.getElementById('artist').value;
-      const caption = document.getElementById('caption').value;
-      const submitBtn = document.getElementById('submitBtn');
-      const status = document.getElementById('status');
+      // Rate limiting check
+      const now = Date.now();
+      if (now - lastUploadTime < UPLOAD_COOLDOWN) {
+        const secondsLeft = Math.ceil((UPLOAD_COOLDOWN - (now - lastUploadTime)) / 1000);
+        showStatus(`Please wait ${secondsLeft} seconds before uploading again`, 'error');
+        return;
+      }
+
+      const token = el.token.value;
+      const photoFile = el.photo.files[0];
+      const audioFile = el.audio.files[0];
+      const song = el.song.value.slice(0, MAX_TEXT_LENGTH);
+      const artist = el.artist.value.slice(0, MAX_TEXT_LENGTH);
+      const caption = el.caption.value.slice(0, MAX_TEXT_LENGTH);
 
       if (!photoFile) {
         showStatus('Please select a photo', 'error');
         return;
       }
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Processing...';
-      status.style.display = 'none';
+      if (photoFile.size > MAX_PHOTO_SIZE) {
+        showStatus('Photo must be under 10MB', 'error');
+        return;
+      }
+
+      if (audioFile && audioFile.size > MAX_AUDIO_SIZE) {
+        showStatus('Audio must be under 15MB', 'error');
+        return;
+      }
+
+      el.submitBtn.disabled = true;
+      el.submitBtn.textContent = 'Processing...';
 
       try {
         // Step 1: Convert image to high-quality JPG
         showStatus('Converting image to JPG...', 'success');
         const jpgBlob = await convertToJPG(photoFile);
 
-        // Step 2: Generate filename (timestamp-based)
-        const timestamp = Date.now();
-        const filename = `photo${timestamp}.jpg`;
+        // Step 2: Generate random filename
+        const randomId = crypto.randomUUID().substring(0, 8);
+        const filename = `photo${randomId}.jpg`;
 
         // Step 3: Convert to base64
         showStatus('Preparing upload...', 'success');
@@ -146,94 +180,89 @@
         let audioFilename = null;
         if (audioFile) {
           showStatus('Processing audio file...', 'success');
-          // Preserve original file extension (mp3 or m4a)
-          const audioExt = audioFile.name.split('.').pop().toLowerCase();
-          audioFilename = `audio${timestamp}.${audioExt}`;
+          const audioExt = audioFile.name.substring(audioFile.name.lastIndexOf('.') + 1).toLowerCase();
+          const audioId = crypto.randomUUID().substring(0, 8);
+          audioFilename = `audio${audioId}.${audioExt}`;
           const audioBase64 = await blobToBase64(audioFile);
 
           showStatus('Uploading audio to GitHub...', 'success');
-          await uploadFile(token, `photos/${audioFilename}`, audioBase64, 'Add audio file');
+          await uploadFile(token, `photos/${audioFilename}`, audioBase64, '🤖 Add audio track');
         }
 
         // Step 5: Upload JPG to GitHub first
         showStatus('Uploading photo to GitHub...', 'success');
-        await uploadFile(token, `photos/${filename}`, base64Data, 'Add new photo');
+        await uploadFile(token, `photos/${filename}`, base64Data, '🤖 Add new photo');
 
-        // Step 6: Get current photos.json with SHA (after all file uploads)
-        showStatus('Reading photos.json...', 'success');
+        // Step 6: Get current posts.json with SHA (after all file uploads)
+        showStatus('Reading posts.json...', 'success');
         const { content: photosJson, sha: currentSha } = await getPhotosJsonWithSha(token);
 
         // Step 7: Add new photo entry
         const photoEntry = {
           file: filename,
           song: song || 'Untitled',
-          artist: artist || 'Unknown Artist',
-          caption: caption || ''
+          artist: artist || 'Unknown Artist'
         };
-        if (audioFilename) {
-          photoEntry.audio = audioFilename;
-        }
+        if (caption) photoEntry.caption = caption;
+        if (audioFilename) photoEntry.audio = audioFilename;
         photosJson.push(photoEntry);
 
-        // Step 8: Update photos.json with the SHA we just got
-        showStatus('Updating photos.json...', 'success');
+        // Step 8: Update posts.json with the SHA we just got
+        showStatus('Updating posts.json...', 'success');
         const photosJsonB64 = utf8ToBase64(JSON.stringify(photosJson, null, 2));
         await updatePhotosJson(token, photosJsonB64, currentSha);
 
-        // Success!
-        showStatus('✅ Success! Post uploaded to ncarters.com', 'success');
-        submitBtn.textContent = 'Upload Another Post';
-        document.getElementById('uploadForm').reset();
-        document.getElementById('preview').style.display = 'none';
+        // Success! Update rate limit timestamp
+        lastUploadTime = Date.now();
+        showStatus('Success! Your post will appear within a few minutes.', 'success');
+        el.form.reset();
+        el.preview.classList.add('hidden');
 
       } catch (error) {
         console.error(error);
-        showStatus(`❌ Error: ${error.message}`, 'error');
-        submitBtn.textContent = 'Try Again';
+        // Generic error message for users, detailed error in console
+        if (error.message.includes('401') || error.message.includes('403')) {
+          showStatus('Authentication failed. Please check your password.', 'error');
+        } else if (error.message.includes('404')) {
+          showStatus('Repository not found. Please check configuration.', 'error');
+        } else if (error.message.includes('422')) {
+          showStatus('Upload failed. File may already exist or be invalid.', 'error');
+        } else {
+          showStatus('Upload failed. Please try again.', 'error');
+        }
       } finally {
-        submitBtn.disabled = false;
+        el.submitBtn.disabled = false;
+        el.submitBtn.textContent = 'Upload';
       }
     });
 
     // Convert any image format to high-quality JPG
-    function convertToJPG(file) {
+    async function convertToJPG(file) {
+      const dataUrl = await readFile(file);
+
       return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
 
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
 
-            canvas.toBlob((blob) => {
-              resolve(blob);
-            }, 'image/jpeg', 0.85); // 85% quality
-          };
-          img.onerror = reject;
-          img.src = e.target.result;
+          canvas.toBlob(resolve, 'image/jpeg', 0.9);
         };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+        img.onerror = reject;
+        img.src = dataUrl;
       });
     }
 
     // Convert blob to base64
-    function blobToBase64(blob) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const base64 = reader.result.split(',')[1];
-          resolve(base64);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
+    async function blobToBase64(blob) {
+      const dataUrl = await readFile(blob);
+      return dataUrl.split(',')[1];
     }
 
     // Convert UTF-8 string to base64 (handles Unicode characters like Spanish accents)
@@ -241,94 +270,42 @@
       return btoa(unescape(encodeURIComponent(str)));
     }
 
-    // Get current photos.json with SHA from GitHub
+    // Get current posts.json with SHA from GitHub
     async function getPhotosJsonWithSha(token) {
       try {
-        const response = await fetch(
-          `${GITHUB_API}/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/photos.json`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Accept': 'application/vnd.github.v3+json'
-            }
-          }
-        );
-
-        if (!response.ok) {
-          // If file doesn't exist, return empty array with null SHA
-          if (response.status === 404) {
-            return { content: [], sha: null };
-          }
-          throw new Error(`GitHub API error: ${response.status}`);
-        }
-
-        const data = await response.json();
+        const data = await githubFetch(token, 'posts.json');
         const content = atob(data.content.replace(/\n/g, ''));
         return { content: JSON.parse(content), sha: data.sha };
       } catch (error) {
-        console.error('Error reading photos.json:', error);
+        // If file doesn't exist, return empty array with null SHA
         return { content: [], sha: null };
       }
     }
 
     // Upload file to GitHub
-    async function uploadFile(token, path, base64Content, message) {
-      const response = await fetch(
-        `${GITHUB_API}/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: message,
-            content: base64Content
-          })
-        }
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to upload file');
-      }
-
-      return response.json();
+    function uploadFile(token, path, base64Content, message) {
+      return githubFetch(token, path, {
+        method: 'PUT',
+        body: JSON.stringify({ message, content: base64Content })
+      });
     }
 
-    // Update photos.json on GitHub with provided SHA
-    async function updatePhotosJson(token, base64Content, sha) {
-      const response = await fetch(
-        `${GITHUB_API}/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/photos.json`,
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: 'Update photos.json',
-            content: base64Content,
-            sha: sha
-          })
-        }
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to update photos.json');
-      }
-
-      return response.json();
+    // Update posts.json on GitHub with provided SHA
+    function updatePhotosJson(token, base64Content, sha) {
+      return githubFetch(token, 'posts.json', {
+        method: 'PUT',
+        body: JSON.stringify({
+          message: '🤖 Update posts database',
+          content: base64Content,
+          sha
+        })
+      });
     }
 
     // Show status message
     function showStatus(message, type) {
-      const status = document.getElementById('status');
-      status.textContent = message;
-      status.className = `status ${type}`;
+      el.status.textContent = message;
+      el.status.className = `status ${type}`;
     }
   </script>
 </body>
