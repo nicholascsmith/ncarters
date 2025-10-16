@@ -10,9 +10,13 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main>
+  <main id="swup" class="transition-fade">
     <section>
-      <a href="/" class="back-link link-invert">← Back</a>
+      <a href="/" class="back-link">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.3,12l3.5-3.5c0.4-0.4,0.4-1,0-1.4c-0.4-0.4-1-0.4-1.4,0l-4.2,4.2l0,0c-0.4,0.4-0.4,1,0,1.4l4.2,4.2c0.2,0.2,0.4,0.3,0.7,0.3l0,0c0.3,0,0.5-0.1,0.7-0.3c0.4-0.4,0.4-1,0-1.4L11.3,12z"/>
+        </svg>
+      </a>
       <h1>New Post</h1>
 
   <form id="uploadForm">
@@ -25,11 +29,6 @@
       <label for="photo">Photo</label>
       <input type="file" id="photo" accept="image/*" required>
       <img id="preview" class="preview hidden">
-    </div>
-
-    <div class="form-group">
-      <label for="caption">Caption</label>
-      <textarea id="caption" placeholder="Caption"></textarea>
     </div>
 
     <div class="form-group">
@@ -64,7 +63,6 @@
       token: document.getElementById('token'),
       song: document.getElementById('song'),
       artist: document.getElementById('artist'),
-      caption: document.getElementById('caption'),
       submitBtn: document.getElementById('submitBtn'),
       preview: document.getElementById('preview')
     };
@@ -143,7 +141,6 @@
       const audioFile = el.audio.files[0];
       const song = el.song.value.slice(0, MAX_TEXT_LENGTH);
       const artist = el.artist.value.slice(0, MAX_TEXT_LENGTH);
-      const caption = el.caption.value.slice(0, MAX_TEXT_LENGTH);
 
       if (!photoFile) {
         alert('Please select a photo');
@@ -200,7 +197,6 @@
         const postEntry = { file: filename };
         if (song) postEntry.song = song;
         if (artist) postEntry.artist = artist;
-        if (caption) postEntry.caption = caption;
         if (audioFilename) postEntry.audio = audioFilename;
         postsJson.push(postEntry);
 
@@ -317,5 +313,8 @@
       });
     }
   </script>
+
+  <script src="https://unpkg.com/swup@4"></script>
+  <script src="app.js"></script>
 </body>
 </html>

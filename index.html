@@ -37,7 +37,7 @@
 </head>
 
 <body>
-  <main>
+  <main id="swup" class="transition-fade">
     <section>
       <header>
         <h1>Nicholas</h1>
@@ -71,7 +71,14 @@
       <p>Send inquiries via <a href="https://t.me/ncarters" class="link-invert" rel="noopener">Telegram</a>, <a href="https://matrix.to/#/#ncarters:matrix.org" class="link-invert" rel="noopener">Matrix</a>, or email.</p>
     </section>
 
-    <section>
+    <section id="posts">
+      <noscript>
+        <p>Enable JavaScript to view posts and email addresses.</p>
+      </noscript>
+      <div class="post-grid"></div>
+    </section>
+
+        <section>
       <h2>Playlists</h2>
       <nav>
         <a href="https://music.apple.com/profile/ncarters" aria-label="Apple Music" rel="noopener">
@@ -87,70 +94,55 @@
       </nav>
     </section>
 
-    <section id="posts">
-      <h2>Posts</h2>
-      <noscript>
-        <p>Enable JavaScript to view posts and email addresses.</p>
-      </noscript>
-      <div class="post-grid"></div>
-    </section>
-
-    <section>
-      <h2>Projects</h2>
-      <ul>
-        <li><a href="https://github.com/nicholascsmith/CCAL" class="link-invert" rel="noopener">CCAL</a></li>
-      </ul>
-    </section>
-
     <section>
       <h2>Links</h2>
-
-      <h3>Bitcoin</h3>
-      <ul>
-        <li><a href="https://dspace.mit.edu/bitstream/handle/1721.1/153030/lowery-jplowery-sm-sdm-2023-thesis.pdf" class="link-invert" rel="noopener">Softwar: A Novel Theory on Power Projection and the National Strategic Significance of Bitcoin</a></li>
-      </ul>
-
-      <h3>Privacy & Security</h3>
       <ul>
         <li><a href="https://www.privacyguides.org" class="link-invert" rel="noopener">Privacy Guides</a></li>
         <li><a href="https://ssd.eff.org" class="link-invert" rel="noopener">Surveillance Self-Defense</a></li>
         <li><a href="https://groups.csail.mit.edu/mac/classes/6.805/articles/crypto/cypherpunks/zimmermann-why-pgp.html" class="link-invert" rel="noopener">Why Do You Need PGP?</a></li>
       </ul>
-
     </section>
 
     <section>
-      <h2>Payments</h2>
-      <h3>Bitcoin via Email (Proton Wallet)</h3>
-      <p>nicholas@ncarters.com</p>
-
-      <h3>Bitcoin Silent Payments</h3>
-      <p>btc&#64;ncarters&#46;com</p>
-
-      <h3>Monero</h3>
-      <p>xmr&#64;ncarters&#46;com</p>
-
-      <h3>Ethereum</h3>
-      <p>ncarters&#46;com</p>
+      <div class="payments-grid">
+        <div>
+          <p class="payment-label">Bitcoin via Email (Proton Wallet)</p>
+          <p>nicholas@ncarters.com</p>
+        </div>
+        <div>
+          <p class="payment-label">Bitcoin Silent Payments</p>
+          <p>btc&#64;ncarters&#46;com</p>
+        </div>
+        <div>
+          <p class="payment-label">Monero</p>
+          <p>xmr&#64;ncarters&#46;com</p>
+        </div>
+        <div>
+          <p class="payment-label">Ethereum</p>
+          <p>ncarters&#46;com</p>
+        </div>
+      </div>
     </section>
 
     <footer>
-      <p id="timestamp" style="display: none;">Last updated: <span></span></p>
+      <div class="footer-grid">
+        <div>
+          <p class="footer-label">Source</p>
+          <a href="https://github.com/nicholascsmith/ncarters" aria-label="Source Code" rel="noopener">
+            <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+              <path d="M44,6H4A2,2,0,0,0,2,8V40a2,2,0,0,0,2,2H44a2,2,0,0,0,2-2V8A2,2,0,0,0,44,6ZM18.3,27.5A2,2,0,0,1,17,31a1.9,1.9,0,0,1-1.3-.5l-6-5a2,2,0,0,1,0-3l6-5a2,2,0,1,1,2.6,3L14,24Zm9.6-12-4,18A1.9,1.9,0,0,1,22,35h-.5a1.9,1.9,0,0,1-1.4-2.4l4-18a2,2,0,1,1,3.8,1Zm10.4,10-6,5A1.9,1.9,0,0,1,31,31a2,2,0,0,1-1.3-3.5L34,24l-4.3-3.5a2,2,0,0,1,2.6-3l6,5a2,2,0,0,1,0,3Z"/>
+            </svg>
+          </a>
+        </div>
+        <div>
+          <p class="footer-label">Built with</p>
+          <p class="footer-tech">HTML • CSS • JS</p>
+        </div>
+      </div>
     </footer>
   </main>
 
-  <script src="posts.js"></script>
-  <script>
-    fetch('https://api.github.com/repos/nicholascsmith/ncarters/commits/main')
-      .then(r => r.json())
-      .then(data => {
-        const date = new Date(data.commit.author.date);
-        const formatted = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-        const timestamp = document.querySelector('#timestamp');
-        timestamp.querySelector('span').textContent = formatted;
-        timestamp.style.display = 'block';
-      })
-      .catch(() => {});
-  </script>
+  <script src="https://unpkg.com/swup@4"></script>
+  <script src="app.js"></script>
 </body>
 </html>
