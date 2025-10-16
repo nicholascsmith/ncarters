@@ -46,10 +46,12 @@ function loadPost() {
     .then(r => r.json())
     .then(posts => {
       const post = posts.find(p => p.file && p.file.replace(/\.[^/.]+$/, '') === postId);
-      if (!post) return;
+      if (!post) {
+        el.errorMessage.style.display = 'flex';
+        return;
+      }
 
-      // Hide error message and show post
-      el.errorMessage.style.display = 'none';
+      // Show post
       el.header.style.display = 'flex';
       el.post.src = `media/${post.file}`;
       el.post.style.display = 'block';

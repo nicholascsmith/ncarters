@@ -64,7 +64,7 @@ li::before { content: "> "; color: var(--text-dim); position: absolute; left: 0;
 .post-view { max-width: 100%; height: auto; display: none; }
 .mute-indicator { position: absolute; bottom: var(--space-sm); right: var(--space-sm); width: var(--icon-size); height: var(--icon-size); background: rgba(0, 0, 0, 0.7); border-radius: 50%; align-items: center; justify-content: center; pointer-events: none; display: none; }
 .mute-indicator svg { width: var(--icon-sm); height: var(--icon-sm); fill: #fff; }
-.error-message { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); margin: var(--space-xl) 0; }
+.error-message { display: none; flex-direction: column; align-items: center; gap: var(--space-md); margin: var(--space-xl) 0; }
 .error-message svg { width: 8rem; height: 8rem; fill: var(--text); opacity: 0.3; }
 .error-message p { color: var(--text-dim); font-size: 1rem; }
 
