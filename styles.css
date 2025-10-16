@@ -87,18 +87,19 @@ button:disabled { cursor: not-allowed; }
 .preview { max-width: 50%; margin: var(--space-md) 0 0; }
 .hidden { display: none; }
 
-/* Payments grid */
-.payments-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); }
-.payment-label { font-weight: 600; font-size: 1rem; color: var(--text-dim); }
+/* Payments */
+.payment-item { display: flex; gap: var(--space-md); align-items: flex-start; margin: var(--space-lg) 0; }
+.payment-item svg { width: 2.85rem; height: 2.85rem; fill: var(--text); flex-shrink: 0; }
+.payment-label { font-weight: 600; font-size: 0.9rem; }
+.payment-address { font-size: 1.1rem; font-family: monospace; }
+
+hr { border: none; border-top: 1px solid var(--text-dim); margin: var(--space-xl) 0; }
 
 /* Footer */
-footer { text-align: left; margin-top: var(--space-xl); padding-top: var(--space-xl); border-top: 1px solid var(--text-dim); }
-footer p { color: var(--text-dim); font-weight: 600; font-size: 1rem; }
-footer svg { width: 3rem; height: 3rem; fill: var(--text-dim); display: block; }
+footer { text-align: center; }
+footer p { font-weight: 600; font-size: 1rem; color: var(--text-dim); }
+footer svg { width: 3rem; height: 3rem; fill: var(--text-dim); display: inline-block; }
 footer a:hover svg { fill: var(--text); }
-.footer-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); }
-.footer-label { color: var(--text); }
-.footer-tech { font-size: 1.65rem; margin-top: var(--space-xs); font-family: monospace; font-weight: 700; }
 
 /* Simple fade transition */
 .transition-fade {
