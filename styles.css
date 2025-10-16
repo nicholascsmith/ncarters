@@ -89,9 +89,9 @@ button:disabled { cursor: not-allowed; }
 
 /* Payments */
 .payment-item { display: flex; gap: var(--space-md); align-items: flex-start; margin: var(--space-lg) 0; }
-.payment-item svg { width: 2.85rem; height: 2.85rem; fill: var(--text); flex-shrink: 0; }
+.payment-item svg { width: 2.8rem; height: 2.8rem; fill: var(--text); flex-shrink: 0; }
 .payment-label { font-weight: 600; font-size: 0.9rem; }
-.payment-address { font-size: 1.1rem; font-family: monospace; }
+.payment-address { font-size: 1.1rem; font-family: monospace; font-weight: 500; }
 
 hr { border: none; border-top: 1px solid var(--text-dim); margin: var(--space-xl) 0; }
 
