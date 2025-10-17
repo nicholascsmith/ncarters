@@ -95,6 +95,6 @@ button:disabled { cursor: not-allowed; }
 .payment-address { font-size: 1.1rem; font-family: monospace; font-weight: 500; }
 
 /* Footer */
-footer { text-align: center; border-top: 1px solid var(--text-dim); padding-top: var(--space-xl); margin-top: var(--space-xl); }
+footer { text-align: center; border-top: 1px solid var(--text-dim); padding-top: var(--space-sm); margin-top: var(--space-xl); }
 footer svg { width: 3rem; height: 3rem; stroke: var(--text-dim); display: inline-block; }
 footer a:hover svg { stroke: var(--text); }
