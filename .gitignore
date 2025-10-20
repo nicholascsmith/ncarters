@@ -1,3 +1,18 @@
-CLAUDE.md
+# Development
+.DS_Store
+.vscode/
+.idea/
+*.log
+
+# Dependencies
+node_modules/
+dist/
+.cache/
+
+# Environment
+.env
+.env.local
+
+# Project specific
 .claude/
-CONTRIBUTING.md
+CLAUDE.md

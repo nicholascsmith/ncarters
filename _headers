@@ -1,8 +1,27 @@
 /*
-  Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self' 'unsafe-inline' https://*.cloudflareinsights.com https://ncarters.com/cdn-cgi/* https://unpkg.com; connect-src https://ncarters.com https://*.cloudflareinsights.com https://ncarters.com/cdn-cgi/* https://api.github.com https://unpkg.com; media-src 'self'
+  Content-Security-Policy: default-src 'none'; style-src 'self'; img-src 'self' data:; script-src 'self'; connect-src 'self' https://api.github.com; media-src 'self'; font-src 'self'; base-uri 'self'; form-action 'self'
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
   Cross-Origin-Embedder-Policy: require-corp
   Cross-Origin-Opener-Policy: same-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.html
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/styles.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/posts.json
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/data/site.json
+  Cache-Control: public, max-age=3600, must-revalidate

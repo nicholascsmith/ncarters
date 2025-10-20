@@ -1,0 +1,79 @@
+{
+  "site": {
+    "title": "ncarters",
+    "name": "Nicholas",
+    "email": "nicholas@ncarters.com",
+    "description": "Web Developer",
+    "url": "https://ncarters.com"
+  },
+  "social": [
+    {
+      "name": "X",
+      "url": "https://x.com/nickcsmith",
+      "icon": "x"
+    },
+    {
+      "name": "GitHub",
+      "url": "https://github.com/nicholascsmith",
+      "icon": "github"
+    },
+    {
+      "name": "Telegram",
+      "url": "https://t.me/ncarters",
+      "icon": "telegram"
+    },
+    {
+      "name": "Matrix",
+      "url": "https://matrix.to/#/#ncarters:matrix.org",
+      "icon": "matrix"
+    }
+  ],
+  "playlists": [
+    {
+      "name": "Apple Music",
+      "url": "https://music.apple.com/profile/ncarters",
+      "icon": "appleMusic"
+    },
+    {
+      "name": "Spotify",
+      "url": "https://open.spotify.com/user/31j63mb42kc6akdxulxe2qdpvl5y",
+      "icon": "spotify"
+    }
+  ],
+  "links": [
+    {
+      "text": "Privacy Guides",
+      "url": "https://www.privacyguides.org"
+    },
+    {
+      "text": "Surveillance Self-Defense",
+      "url": "https://ssd.eff.org"
+    },
+    {
+      "text": "Why Do You Need PGP?",
+      "url": "https://groups.csail.mit.edu/mac/classes/6.805/articles/crypto/cypherpunks/zimmermann-why-pgp.html"
+    }
+  ],
+  "payments": [
+    {
+      "label": "Bitcoin via Email (Proton Wallet)",
+      "address": "nicholas@ncarters.com",
+      "icon": "bitcoin"
+    },
+    {
+      "label": "Bitcoin Silent Payments",
+      "address": "btc@ncarters.com",
+      "icon": "bitcoin"
+    },
+    {
+      "label": "Monero",
+      "address": "xmr@ncarters.com",
+      "icon": "monero"
+    },
+    {
+      "label": "Ethereum",
+      "address": "ncarters.com",
+      "icon": "ethereum"
+    }
+  ]
+}
