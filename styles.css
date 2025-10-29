@@ -31,7 +31,7 @@ body {
 
 h1 {
   font-size: 2.5rem;
-  line-height: 1.25;
+  line-height: 1;
 }
 
 h2 {
@@ -41,7 +41,7 @@ h2 {
 
 h3 {
   font-size: 1.5rem;
-  margin: var(--space-lg) 0 var(--space-xs);
+  margin: 0 0 var(--space-xs);
 }
 
 address {
@@ -87,13 +87,15 @@ body {
 }
 
 section {
-  margin: var(--space-xl) 0;
+  margin: 0 0 var(--space-md);
 }
+
+#payments { margin-top: var(--space-lg); }
 
 nav {
   display: flex;
-  gap: var(--space-md);
-  margin: 0.75rem 0 0;
+  gap: 0.75rem;
+  margin: var(--space-sm) 0 0;
 }
 
 .grid {
@@ -106,7 +108,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 0 var(--space-sm);
+  margin: 0 0 var(--space-md);
 }
 
 .header .back {
@@ -116,6 +118,9 @@ nav {
 .header h1 {
   margin: 0;
   font-size: 1.5rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
 }
 
 .details {
@@ -128,13 +133,13 @@ nav {
   display: flex;
   gap: var(--space-md);
   align-items: flex-start;
-  margin: var(--space-lg) 0;
+  margin: var(--space-sm) 0;
 }
 
 footer {
   text-align: center;
   padding-top: var(--space-md);
-  margin-top: var(--space-xl);
+  margin: var(--space-sm) 0 var(--space-lg);
 }
 
 a {
@@ -201,7 +206,7 @@ dd {
 
 .icon {
   fill: currentColor;
-  display: inline-block;
+  display: block;
 }
 
 nav .icon {
