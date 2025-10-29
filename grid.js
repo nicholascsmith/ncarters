@@ -1,16 +1,14 @@
-// Load posts
-const container = document.querySelector('.post-grid');
+const grid = document.querySelector('.grid');
+const stripExtension = f => f.replace(/\.[^/.]+$/, '');
 
 fetch('feed.json')
   .then(response => response.json())
   .then(posts => {
-    container.innerHTML = posts.map(post => {
-      const postId = post.file.replace(/\.[^/.]+$/, '');
-      return `<a href="post.html?${postId}" class="post-item">
-        <img src="media/${post.file}" alt="Post" loading="lazy">
-      </a>`;
-    }).join('');
+    grid.innerHTML = posts.reverse().map(post =>
+      `<a href="post.html?${stripExtension(post.file)}" class="thumbnail">
+        <img src="media/${post.file}" alt="post">
+      </a>`
+    ).join('');
   })
   .catch(() => {
-    container.innerHTML = '<p>Enable JavaScript to view posts.</p>';
   });

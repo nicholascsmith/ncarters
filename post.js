@@ -1,47 +1,48 @@
-// Load and display post from feed.json based on URL parameter
-const postId = window.location.search.slice(1);
+const key = window.location.search.slice(1);
+const redirectHome = () => window.location.href = '/';
 
-if (!postId) {
-  document.body.dataset.postError = 'true';
+if (!key) {
+  redirectHome();
 } else {
-  fetch('feed.json')
-    .then(response => response.json())
-    .then(posts => {
-      const post = posts.find(p => p.file.replace(/\.[^/.]+$/, '') === postId);
+  (async () => {
+    const stripExtension = filename => filename.replace(/\.[^/.]+$/, '');
+
+    try {
+      const posts = await fetch('feed.json').then(r => r.json());
+      const post = posts.find(p => stripExtension(p.file) === key);
 
       if (!post) {
-        document.body.dataset.postError = 'true';
+        redirectHome();
         return;
       }
 
       document.body.dataset.postLoaded = 'true';
       document.getElementById('post').src = `media/${post.file}`;
 
-      // Music metadata (optional)
-      if (post.song && post.artist) {
-        document.querySelector('.post-music').textContent = `♫ ${post.song} • ${post.artist}`;
+      if (post.year) {
+        document.querySelector('.timestamp').textContent = post.year;
       }
 
-      // Audio player with mute toggle (optional)
+      if (post.song && post.artist) {
+        document.querySelector('.music').textContent = `♫ ${post.song} · ${post.artist}`;
+      }
+
       if (post.audio) {
         const audio = document.getElementById('audio');
-        const muteIndicator = document.querySelector('.mute-indicator');
-        const container = document.querySelector('.post-container');
+        const muteIndicator = document.querySelector('.mute');
+        const container = document.querySelector('.container');
 
         audio.src = `media/${post.audio}`;
-        audio.muted = true;
         audio.loop = true;
-        audio.play().catch(() => {});
-
         document.body.dataset.hasAudio = 'true';
 
         container.addEventListener('click', () => {
-          audio.muted = !audio.muted;
-          muteIndicator.classList.toggle('muted', audio.muted);
+          audio.paused ? audio.play().catch(() => {}) : audio.pause();
+          muteIndicator.classList.toggle('muted', audio.paused);
         });
       }
-    })
-    .catch(() => {
-      document.body.dataset.postError = 'true';
-    });
+    } catch {
+      redirectHome();
+    }
+  })();
 }

@@ -3,56 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
   <title>ncarters</title>
+
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <svg xmlns="http://www.w3.org/2000/svg" class="icon-defs">
-    <symbol id="icon-back-arrow" viewBox="0 0 24 24">
-      <path d="M13.83 19a1 1 0 0 1-.78-.37l-4.83-6a1 1 0 0 1 0-1.27l5-6a1 1 0 0 1 1.54 1.28L10.29 12l4.32 5.36a1 1 0 0 1-.78 1.64z"/>
-    </symbol>
-    <symbol id="icon-error404" viewBox="0 0 472.615 472.615">
-      <path d="M0,0v78.74h472.615V0H0z M59.077,49.201H39.385V29.509h19.692V49.201z M98.462,49.201H78.769V29.509h19.692V49.201z M137.846,49.201h-19.692V29.509h19.692V49.201z M423.385,49.201H187.077V29.509h236.308V49.201z"/>
-      <path d="M0,98.432v374.183h472.615V98.432H0z M137.846,137.817h196.923v19.692H137.846V137.817z M285.538,251.047v59.077 c0,29.856-24.298,54.154-54.154,54.154c-29.856,0-54.154-24.298-54.154-54.154v-59.077c0-29.856,24.298-54.154,54.154-54.154 C261.24,196.894,285.538,221.191,285.538,251.047z M68.923,196.894h19.692v78.769h49.231v-29.538h19.692v118.154h-19.692v-68.923 H68.923V196.894z M334.769,433.201H137.846v-19.692h196.923V433.201z M393.846,364.278h-19.692v-68.923h-68.923v-98.461h19.692 v78.769h49.231v-29.538h19.692V364.278z"/>
-      <path d="M231.385,216.586c-19,0-34.461,15.461-34.461,34.462v59.077c0,18.999,15.461,34.462,34.461,34.462 c19,0,34.462-15.462,34.462-34.462v-59.077C265.846,232.047,250.385,216.586,231.385,216.586z"/>
-    </symbol>
-    <symbol id="icon-muted" viewBox="0 0 24 24">
-      <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
-    </symbol>
-    <symbol id="icon-unmuted" viewBox="0 0 24 24">
-      <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-    </symbol>
-  </svg>
-
   <main>
-    <section>
-      <a href="/#posts" class="back-link">
-        <svg class="icon icon-back-arrow"><use href="#icon-back-arrow"></use></svg>
+    <header class="header">
+      <a href="/" class="back">
+        <svg class="icon icon-arrow-left"><use href="icons.svg#icon-arrow-left"></use></svg>
       </a>
-      <div class="post-content">
-        <div class="post-header">
-          <a href="/#posts">
-            <img src="media/profile.jpg" alt="Profile" class="post-pfp">
-          </a>
-          <div class="post-info">
-            <a href="/#posts" class="post-username">Nicholas</a>
-            <div class="post-music"></div>
-          </div>
+      <h1>post</h1>
+      <h1 class="timestamp"></h1>
+    </header>
+    <div class="content">
+      <div class="details">
+        <a href="/">
+          <img src="media/profile.jpg" alt="Profile" class="pfp">
+        </a>
+        <div class="text">
+          <a href="/" class="user">Nicholas</a>
+          <div class="music"></div>
         </div>
-        <div class="post-container">
-          <img class="post-view" id="post" alt="Post">
-          <div class="mute-indicator muted">
-            <svg class="icon icon-muted"><use href="#icon-muted"></use></svg>
-            <svg class="icon icon-unmuted"><use href="#icon-unmuted"></use></svg>
-          </div>
+      </div>
+      <div class="container">
+        <img id="post" alt="Post">
+        <div class="mute muted">
+          <svg class="icon icon-muted"><use href="icons.svg#icon-muted"></use></svg>
+          <svg class="icon icon-unmuted"><use href="icons.svg#icon-unmuted"></use></svg>
         </div>
-        <audio id="audio" loop></audio>
       </div>
-      <div class="error-message">
-        <svg class="icon icon-error404"><use href="#icon-error404"></use></svg>
-        <p>404 Error</p>
-      </div>
-    </section>
+      <audio id="audio"></audio>
+    </div>
   </main>
 
   <script type="module" src="post.js"></script>
