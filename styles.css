@@ -139,7 +139,7 @@ nav {
 footer {
   text-align: center;
   padding-top: var(--space-md);
-  margin: var(--space-sm) 0 var(--space-lg);
+  margin: var(--space-sm) 0 0;
 }
 
 a {
