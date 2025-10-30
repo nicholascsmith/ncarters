@@ -44,10 +44,6 @@ if (!key) {
         audio.src = `media/${post.audio}`;
         document.body.dataset.hasAudio = 'true';
 
-        audio.addEventListener('loadedmetadata', () => {
-          if (startTime !== null) audio.currentTime = startTime;
-        }, { once: true });
-
         if (endTime !== null) {
           audio.addEventListener('timeupdate', () => {
             if (audio.currentTime >= endTime) {
@@ -60,6 +56,7 @@ if (!key) {
 
         container.addEventListener('click', () => {
           if (audio.paused) {
+            if (startTime !== null) audio.currentTime = startTime;
             audio.play().catch(() => {});
           } else {
             audio.pause();
