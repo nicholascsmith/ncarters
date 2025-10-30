@@ -54,6 +54,13 @@ if (!key) {
           audio.loop = true;
         }
 
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden && !audio.paused) {
+            audio.pause();
+            muteIndicator.classList.add('muted');
+          }
+        });
+
         container.addEventListener('click', () => {
           if (audio.paused) {
             if (startTime !== null) audio.currentTime = startTime;
