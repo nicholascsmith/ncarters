@@ -1,78 +1,79 @@
-const key = window.location.search.slice(1);
-const redirectHome = () => window.location.href = '/';
+const key = decodeURIComponent(window.location.search.slice(1));
+
+function parseTimestamp(timestamp) {
+  const [min, sec] = timestamp.split(':').map(Number);
+  return (min * 60) + sec;
+}
+
+async function initPost() {
+  try {
+    const posts = await fetch('feed.json').then(r => r.json());
+    const post = posts.find(p => p.file.replace(/\.[^/.]+$/, '') === key);
+
+    if (!post) {
+      window.location.href = '/';
+      return;
+    }
+
+    document.body.dataset.postLoaded = 'true';
+    document.getElementById('post').src = `media/${post.file}`;
+
+    if (post.year) {
+      document.querySelector('.timestamp').textContent = post.year;
+    }
+
+    if (post.song && post.artist) {
+      document.querySelector('.music').textContent = `♫ ${post.song} · ${post.artist}`;
+    }
+
+    if (post.audio) {
+      const audio = document.getElementById('audio');
+      const muteIndicator = document.querySelector('.mute');
+      const container = document.querySelector('.container');
+
+      const startTime = post.audioStart ? parseTimestamp(post.audioStart) : null;
+      const endTime = post.audioEnd ? parseTimestamp(post.audioEnd) : null;
+
+      audio.src = `media/${post.audio}`;
+      document.body.dataset.hasAudio = 'true';
+
+      if (endTime !== null) {
+        audio.addEventListener('timeupdate', () => {
+          if (audio.currentTime >= endTime) {
+            audio.currentTime = startTime || 0;
+          }
+        });
+      } else {
+        audio.loop = true;
+      }
+
+      let isPlayPending = false;
+
+      container.addEventListener('click', async () => {
+        if (audio.paused && !isPlayPending) {
+          isPlayPending = true;
+          if (startTime !== null) audio.currentTime = startTime;
+
+          try {
+            await audio.play();
+            muteIndicator.classList.remove('muted');
+          } catch {
+          } finally {
+            isPlayPending = false;
+          }
+        } else if (!isPlayPending) {
+          audio.pause();
+          muteIndicator.classList.add('muted');
+        }
+      });
+    }
+  } catch {
+    window.location.href = '/';
+  }
+}
 
 if (!key) {
-  redirectHome();
+  window.location.href = '/';
 } else {
-  (async () => {
-    const stripExtension = filename => filename.replace(/\.[^/.]+$/, '');
-
-    try {
-      const posts = await fetch('feed.json').then(r => r.json());
-      const post = posts.find(p => stripExtension(p.file) === key);
-
-      if (!post) {
-        redirectHome();
-        return;
-      }
-
-      document.body.dataset.postLoaded = 'true';
-      document.getElementById('post').src = `media/${post.file}`;
-
-      if (post.year) {
-        document.querySelector('.timestamp').textContent = post.year;
-      }
-
-      if (post.song && post.artist) {
-        document.querySelector('.music').textContent = `♫ ${post.song} · ${post.artist}`;
-      }
-
-      if (post.audio) {
-        const audio = document.getElementById('audio');
-        const muteIndicator = document.querySelector('.mute');
-        const container = document.querySelector('.container');
-
-        const parseTime = t => {
-          if (!t) return null;
-          const [min, sec] = t.split(':').map(Number);
-          return (min * 60) + sec;
-        };
-
-        const startTime = parseTime(post.audioStart);
-        const endTime = parseTime(post.audioEnd);
-
-        audio.src = `media/${post.audio}`;
-        document.body.dataset.hasAudio = 'true';
-
-        if (endTime !== null) {
-          audio.addEventListener('timeupdate', () => {
-            if (audio.currentTime >= endTime) {
-              audio.currentTime = startTime || 0;
-            }
-          });
-        } else {
-          audio.loop = true;
-        }
-
-        document.addEventListener('visibilitychange', () => {
-          if (document.hidden && !audio.paused) {
-            audio.pause();
-            muteIndicator.classList.add('muted');
-          }
-        });
-
-        container.addEventListener('click', () => {
-          if (audio.paused) {
-            if (startTime !== null) audio.currentTime = startTime;
-            audio.play().catch(() => {});
-          } else {
-            audio.pause();
-          }
-          muteIndicator.classList.toggle('muted', audio.paused);
-        });
-      }
-    } catch {
-      redirectHome();
-    }
-  })();
+  initPost();
 }

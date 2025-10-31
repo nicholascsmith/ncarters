@@ -1,14 +1,28 @@
 const grid = document.querySelector('.grid');
-const stripExtension = f => f.replace(/\.[^/.]+$/, '');
 
-fetch('feed.json')
-  .then(response => response.json())
-  .then(posts => {
-    grid.innerHTML = posts.reverse().map(post =>
-      `<a href="post.html?${stripExtension(post.file)}" class="thumbnail">
-        <img src="media/${post.file}" alt="post">
-      </a>`
-    ).join('');
-  })
-  .catch(() => {
-  });
+async function initGrid() {
+  try {
+    const response = await fetch('feed.json');
+    const posts = await response.json();
+
+    const fragment = document.createDocumentFragment();
+
+    [...posts].reverse().forEach(post => {
+      const link = document.createElement('a');
+      link.href = `post.html?${post.file.replace(/\.[^/.]+$/, '')}`;
+      link.className = 'thumbnail';
+
+      const img = document.createElement('img');
+      img.src = `media/${post.file}`;
+      img.alt = 'post';
+
+      link.appendChild(img);
+      fragment.appendChild(link);
+    });
+
+    grid.appendChild(fragment);
+  } catch {
+  }
+}
+
+initGrid();
