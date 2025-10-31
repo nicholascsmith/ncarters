@@ -66,6 +66,13 @@ async function initPost() {
           muteIndicator.classList.add('muted');
         }
       });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden && !audio.paused) {
+          audio.pause();
+          muteIndicator.classList.add('muted');
+        }
+      });
     }
   } catch {
     window.location.href = '/';
